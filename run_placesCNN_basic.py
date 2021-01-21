@@ -10,6 +10,7 @@ from torchvision import transforms as trn
 from torch.nn import functional as F
 import os
 from PIL import Image
+import wget
 
 # th architecture to use
 arch = 'resnet18'
@@ -17,6 +18,7 @@ arch = 'resnet18'
 # load the pre-trained weights
 model_file = './resnet18_places365.pth.tar'
 if not os.access(model_file, os.W_OK):
+    print("Hello")
     weight_url = 'http://places2.csail.mit.edu/models_places365/resnet18_places365.pth.tar'
     os.system('wget ' + weight_url)
 
@@ -38,6 +40,7 @@ centre_crop = trn.Compose([
 # load the class label
 file_name = 'categories_places365.txt'
 if not os.access(file_name, os.W_OK):
+    print("Hello 1")
     synset_url = 'https://raw.githubusercontent.com/csailvision/places365/master/categories_places365.txt'
     os.system('wget ' + synset_url)
 classes = list()
@@ -47,10 +50,11 @@ with open(file_name) as class_file:
 classes = tuple(classes)
 
 # load the test image
-img_name = './12.jpg'
+img_name = "xyz.jpg"
 if not os.access(img_name, os.W_OK):
-    img_url = 'http://places.csail.mit.edu/demo/' + img_name
-    os.system('wget ' + img_url)
+    print("Hello 2")
+    img_url = "https://farm4.staticflickr.com/3609/3460002981_9121bb0695.jpg"
+    img_name = wget.download(img_url)
 
 img = Image.open(img_name)
 input_img = V(centre_crop(img).unsqueeze(0))
@@ -64,3 +68,7 @@ print('{} prediction on {}'.format(arch,img_name))
 # output the prediction
 for i in range(0, 5):
     print('{:.3f} -> {}'.format(probs[i], classes[idx[i]]))
+
+path = os.path.join('./',img_name)
+if os.path.exists(path):
+    os.remove(path)
